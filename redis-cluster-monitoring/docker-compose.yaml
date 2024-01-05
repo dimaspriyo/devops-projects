@@ -101,11 +101,24 @@ services:
       - GF_INSTALL_PLUGINS=redis-datasource
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_SECURITY_ADMIN_USER=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+    command: /bin/sh -c "sleep 2 && grafana-cli admin reset-admin-password \"admin\" && curl -X POST -H 'Content-Type:\ application/json' -d '{\"name\":\"redis\",\"type\":\"redis\",\"access\":\"proxy\",\"url\":\"http://redis-node-0:6379\",\"password\":\"\",\"database\":\"0\",\"basicAuth\":false}' http:\\admin:admin@localhost:3000/api/datasources \ && 
+                  curl -s -X POST -H 'Content-Type:\ application/json' \
+                  -d '{\"name\":\"api-key\",\"role\":\"Admin\",\"secondsToLive\":86400}' \
+                  http://admin:admin@localhost:3000/api/auth/keys "
     volumes:
       - ./datasources:/etc/grafana/provisioning/datasources
       # Uncomment to preserve Grafana configuration
       # - ./data:/var/lib/grafana
 
+
+  configure-grafana:
+    image: alpine
+    entrypoint: /bin/sh
+    depends_on:
+      - grafana
 networks:
   cluster_network:
     driver: bridge
