@@ -3,6 +3,38 @@
 
 version: '2'
 services:
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    networks: 
+      - cluster_network
+    ports:
+      - '3000:3000'
+    environment:
+      - GF_AUTH_BASIC_ENABLED=false
+      - GF_ENABLE_GZIP=true
+      - GF_USERS_DEFAULT_THEME=light
+      - GF_DEFAULT_APP_MODE=development
+      - GF_INSTALL_PLUGINS=redis-datasource
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_SECURITY_SKIP_LOGIN_BUTTON=true
+    command: >
+      bash -c '
+      until curl -s http://redis-node-0:6379; do
+        echo "Waiting for Redis..."
+        sleep 2
+      done && grafana-server --homepath=/usr/share/grafana --config=/etc/grafana/grafana.ini'
+
+    # volumes:
+      # - ./datasources:/etc/grafana/provisioning/datasources
+      # Uncomment to preserve Grafana configuration
+      # - ./data:/var/lib/grafana
+      
   redis-node-0:
     image: docker.io/bitnami/redis-cluster:7.2
     networks: 
@@ -86,39 +118,26 @@ services:
 #   redis-cluster_data-5:
 #     driver: local
 
-  grafana:
-    container_name: grafana
-    image: grafana/grafana:latest
-    networks: 
+
+  cconfigure-grafana:
+    # image: alpine
+    networks:
       - cluster_network
-    ports:
-      - '3000:3000'
-    environment:
-      - GF_AUTH_BASIC_ENABLED=false
-      - GF_ENABLE_GZIP=true
-      - GF_USERS_DEFAULT_THEME=light
-      - GF_DEFAULT_APP_MODE=development
-      - GF_INSTALL_PLUGINS=redis-datasource
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-      - GF_SECURITY_ALLOW_EMBEDDING=true
-    command: /bin/sh -c "sleep 2 && grafana-cli admin reset-admin-password \"admin\" && curl -X POST -H 'Content-Type:\ application/json' -d '{\"name\":\"redis\",\"type\":\"redis\",\"access\":\"proxy\",\"url\":\"http://redis-node-0:6379\",\"password\":\"\",\"database\":\"0\",\"basicAuth\":false}' http:\\admin:admin@localhost:3000/api/datasources \ && 
-                  curl -s -X POST -H 'Content-Type:\ application/json' \
-                  -d '{\"name\":\"api-key\",\"role\":\"Admin\",\"secondsToLive\":86400}' \
-                  http://admin:admin@localhost:3000/api/auth/keys "
-    volumes:
-      - ./datasources:/etc/grafana/provisioning/datasources
-      # Uncomment to preserve Grafana configuration
-      # - ./data:/var/lib/grafana
-
-
-  configure-grafana:
-    image: alpine
-    entrypoint: /bin/sh
+    build:
+      context: ./configure-grafana
+      dockerfile: Dockerfile
     depends_on:
       - grafana
+    # entrypoint: /bin/sh
+    # command: -c "
+    #   apk add --no-cache curl &&
+    #   until curl -s http://redis-node-0:6379; do
+    #     echo 'Waiting for Redis...'
+    #     sleep 2
+    #   done && curl -X POST -H 'Content-Type:application/json' -d ' { \"name\":"api-key\", \"role\":"Admin\", \"secondsToLive\":86400 }' http://admin:admin_password@grafana:3000/api/auth/keys &&
+    #   curl -X POST -H 'Content-Type:application/json' -d ' { "id":null, "orgId":1, "folderId":null, "overwrite":false, "dashboard":{ "id":null, "uid":null, "title":"Sample Dashboard", "timezone":"browser", "schemaVersion":27, "version":0, "time":{"from":"now-6h","to":"now"}, "refresh":"10s", "panels":[], "annotations":{ "list":[] }, "hideControls":false }, "folderId":0, "overwrite":false }' http://admin:admin_password@grafana:3000/api/dashboards/db"
+
+
 networks:
   cluster_network:
     driver: bridge
