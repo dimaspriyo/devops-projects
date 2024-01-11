@@ -1,1 +1,0 @@
-[{"id":1,"uid":"d424c97e-e6c6-4a32-8cd1-0d52e25af20a","orgId":1,"name":"Redis","type":"redis-datasource","typeName":"Redis","typeLogoUrl":"public/plugins/redis-datasource/img/logo.svg","access":"proxy","url":"redis://redis-node-0:6379","user":"","database":"","basicAuth":false,"isDefault":true,"jsonData":{"client":"cluster"},"readOnly":false}]

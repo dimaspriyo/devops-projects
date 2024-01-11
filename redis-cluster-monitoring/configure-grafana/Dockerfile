@@ -12,9 +12,13 @@ RUN apk add curl
 
 # CMD ["tail", "-f", "/dev/null"]
 
-COPY configure-grafana.sh /entrypoint.sh
-COPY datasources /datasource
-RUN chmod +x /entrypoint.sh
-# ENTRYPOINT ["sh"," /entrypoint.sh"]
+COPY . /
+RUN ls -l
+RUN cat configure-grafana.sh
+# RUN readlink -f /configure-grafana/configure-grafana.sh
+RUN chmod +x configure-grafana.sh
+CMD configure-grafana.sh
+
+# ENTRYPOINT ["sh"," configure-grafana.sh"]
 CMD ["tail", "-f", "/dev/null"]
-CMD ["sh", "-x", "/entrypoint.sh"]
+# CMD ["sh", "-x", "/entrypoint.sh"]

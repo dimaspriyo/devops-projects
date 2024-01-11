@@ -120,7 +120,6 @@ services:
 
 
   cconfigure-grafana:
-    # image: alpine
     networks:
       - cluster_network
     build:
@@ -128,16 +127,6 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - grafana
-    # entrypoint: /bin/sh
-    # command: -c "
-    #   apk add --no-cache curl &&
-    #   until curl -s http://redis-node-0:6379; do
-    #     echo 'Waiting for Redis...'
-    #     sleep 2
-    #   done && curl -X POST -H 'Content-Type:application/json' -d ' { \"name\":"api-key\", \"role\":"Admin\", \"secondsToLive\":86400 }' http://admin:admin_password@grafana:3000/api/auth/keys &&
-    #   curl -X POST -H 'Content-Type:application/json' -d ' { "id":null, "orgId":1, "folderId":null, "overwrite":false, "dashboard":{ "id":null, "uid":null, "title":"Sample Dashboard", "timezone":"browser", "schemaVersion":27, "version":0, "time":{"from":"now-6h","to":"now"}, "refresh":"10s", "panels":[], "annotations":{ "list":[] }, "hideControls":false }, "folderId":0, "overwrite":false }' http://admin:admin_password@grafana:3000/api/dashboards/db"
-
-
 networks:
   cluster_network:
     driver: bridge
