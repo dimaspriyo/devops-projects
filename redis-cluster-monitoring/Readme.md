@@ -9,3 +9,5 @@
 ![Redis Data source](https://github.com/dimaspriyo/devops-projects/blob/main/redis-cluster-monitoring/screenshoots/import-redis-dashboard.png)
 3. Import Redis Dashboard
 ![Redis Dashboard](https://github.com/dimaspriyo/devops-projects/blob/main/redis-cluster-monitoring/screenshoots/update-redis-datasource-password.png)
+4. Test it using  "redis-benchmark -t set,get -q  -c 100 -p 6380 -a bitnami" (adjust to your own scenario)
+5. check the redis dashbord and you will notice there's some changes in gauges or any other metrics

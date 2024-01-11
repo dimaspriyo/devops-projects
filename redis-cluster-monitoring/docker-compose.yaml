@@ -39,6 +39,8 @@ services:
     image: docker.io/bitnami/redis-cluster:7.2
     networks: 
       - cluster_network
+    ports:
+      - "6380:6379"
     # volumes:
     #   - redis-cluster_data-0:/bitnami/redis/data
     environment:
@@ -125,8 +127,8 @@ services:
     build:
       context: ./configure-grafana
       dockerfile: Dockerfile
-    depends_on:
-      - grafana
+    # depends_on:
+      # - grafana
 networks:
   cluster_network:
     driver: bridge
