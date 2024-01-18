@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  websocket-server-1:
+    networks:
+      - websocket_network
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9100"
+  websocket-server-2:
+    networks:
+      - websocket_network
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9100"
+
+  haproxy:
+    image: haproxy:alpine3.19
+    networks:
+      - websocket_network
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    ports:
+      - "9200:9200"
+    depends_on:
+      - websocket-server-1
+      - websocket-server-2
+
+networks:
+  websocket_network:
+    driver: bridge  
+
