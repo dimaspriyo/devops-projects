@@ -30,6 +30,13 @@ services:
       - websocket-server-1
       - websocket-server-2
 
+  redis:
+    image: redis:alpine3.19
+    networks:
+      - websocket_network
+    ports:
+      - "6390:6379"
+
 networks:
   websocket_network:
     driver: bridge  
